@@ -1,13 +1,14 @@
 #include <SFML/Graphics.hpp>
+#include <vector>
 
 // ----- KLASA PALETKA ----- //
 class Paletka {
 private:
     sf::Vector2f position;           // pozycja paletki
-    sf::RectangleShape paddleShape;  // kszta³t paletki
-    const float speed = 5.f;         // prêdkoœæ paletki
-    const float width = 100.f;       // szerokoœæ paletki
-    const float height = 20.f;       // wysokoœæ paletki
+    sf::RectangleShape paddleShape;  // ksztalt paletki
+    const float speed = 5.f;         // predkosc paletki
+    const float width = 100.f;       // szerokosc paletki
+    const float height = 20.f;       // wysokosc paletki
 
 public:
     // Konstruktor
@@ -15,7 +16,7 @@ public:
         position = startPosition;
 
         paddleShape.setSize({ width, height });
-        paddleShape.setOrigin(width / 2.f, height / 2.f); // odniesienie do œrodka paletki
+        paddleShape.setOrigin(width / 2.f, height / 2.f); // odniesienie do srodka paletki
         paddleShape.setPosition(position);
         paddleShape.setFillColor(sf::Color(60, 130, 170));
     }
@@ -47,8 +48,8 @@ public:
     }
 
     // gettery
-    sf::Vector2f getPosition() const { return position; }   // zwraca pozycjê paletki
-    float getWidth() const { return width; }                // zwraca szerokoœæ paletki
-    float getHeight() const { return height; }              // zwraca wysokoœæ paletki
+    sf::Vector2f getPosition() const { return position; }   // zwraca pozycje paletki
+    float getWidth() const { return width; }                // zwraca szerokosc paletki
+    float getHeight() const { return height; }              // zwraca wysokosc paletki
     sf::FloatRect getGlobalBounds() const { return paddleShape.getGlobalBounds(); } // granice paletki
 };

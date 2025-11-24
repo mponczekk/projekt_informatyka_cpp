@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <vector>
 
 // ----- KLASA PILKA ----- //
 class Pilka {
@@ -6,7 +7,7 @@ private:
     sf::Vector2f position;          // pozycja pilki
     sf::Vector2f velocity;          // predkosc pilki
     float radius;                   // promien pilki
-    sf::CircleShape ballShape;      // kszta³t pilki
+    sf::CircleShape ballShape;      // ksztalt pilki
 public:
     // Konstruktor
     Pilka(sf::Vector2f startPosition, sf::Vector2f startVelocity, float r) {
@@ -15,7 +16,7 @@ public:
         radius = r;
 
         ballShape.setRadius(radius);
-        ballShape.setOrigin(radius, radius);    // odniesienie do œrodka pilki
+        ballShape.setOrigin(radius, radius);    // odniesienie do srodka pilki
         ballShape.setPosition(position);
         ballShape.setFillColor(sf::Color::White);
     }
@@ -32,7 +33,7 @@ public:
     // odbicie pilki Y
     void odbijY() { velocity.y = -velocity.y; }
 
-    // kolizja ze œcianami
+    // kolizja ze scianami
     void kolizjaScian(float WIDTH, float HEIGHT) {
         if (position.x - radius < 0 || position.x + radius > WIDTH) {
             odbijX();

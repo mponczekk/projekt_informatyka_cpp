@@ -1,5 +1,5 @@
-
 #include <SFML/Graphics.hpp>
+#include <vector>
 #include <array>
 
 class Cegla : public sf::RectangleShape {
