@@ -3,7 +3,7 @@
 #include <array>
 #include <iostream>
 
-#define MAX_LICZBA_POZIOMOW 3
+#define MAX_LICZBA_POZIOMOW 4
 
 class Menu {
 private:
@@ -13,18 +13,16 @@ private:
 
 public:
     Menu(float width, float height) {
-        // wczytywanie czcionki z folderu resources/fonts
-        if (!font.loadFromFile("arial.ttf")) {
-            std::cerr << "Blad: Nie mozna zaladowac czcionki 'resources/fonts/arial.ttf'\n";
+        if (!font.loadFromFile("Chunkfive Ex.ttf")) {
+            std::cerr << "Blad! Brak pliku z czcionka";
             return;
         }
 
-        // ustawienie tekstu
         menu[0].setFont(font); menu[0].setFillColor(sf::Color(255, 165, 0)); menu[0].setString("Nowa gra");
-        menu[1].setFont(font); menu[1].setFillColor(sf::Color::White); menu[1].setString("Ostatnie wyniki");
-        menu[2].setFont(font); menu[2].setFillColor(sf::Color::White); menu[2].setString("Wyjscie");
+        menu[1].setFont(font); menu[1].setFillColor(sf::Color::White); menu[1].setString("Wczytaj gre");
+        menu[2].setFont(font); menu[2].setFillColor(sf::Color::White); menu[2].setString("Ostatnie wyniki");
+        menu[3].setFont(font); menu[3].setFillColor(sf::Color::White); menu[3].setString("Wyjscie");
 
-        // wyœrodkowanie tekstu
         for (int i = 0; i < MAX_LICZBA_POZIOMOW; i++) {
             menu[i].setOrigin(
                 menu[i].getLocalBounds().left + menu[i].getLocalBounds().width / 2.f,
@@ -40,7 +38,6 @@ public:
         selectedItem--;
         if (selectedItem < 0) selectedItem = MAX_LICZBA_POZIOMOW - 1;
         menu[selectedItem].setFillColor(sf::Color(255, 165, 0));
-        menu[selectedItem].setStyle(sf::Text::Bold);
     }
 
     void przesunD() {
@@ -49,7 +46,6 @@ public:
         selectedItem++;
         if (selectedItem >= MAX_LICZBA_POZIOMOW) selectedItem = 0;
         menu[selectedItem].setFillColor(sf::Color(255, 165, 0));
-        menu[selectedItem].setStyle(sf::Text::Bold);
     }
 
     int getSelectedItem() const { return selectedItem; }

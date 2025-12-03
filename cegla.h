@@ -10,7 +10,6 @@ private:
     static const std::array<sf::Color, 4> colorLUT;
 
 public:
-    // Konstruktor
     Cegla(sf::Vector2f startPo, sf::Vector2f rozmiar, int L)
         : punktyZycia(L), czyJestZniszczony(false)
     {
@@ -38,13 +37,20 @@ public:
             return;
         }
 
-        setFillColor(colorLUT[punktyZycia]);
+        size_t index = static_cast<size_t>(punktyZycia);
+        if (index < colorLUT.size()) {
+            setFillColor(colorLUT[index]);
+        }
+        else {
+            setFillColor(sf::Color::Magenta);
+        }
     }
 
     bool czyZniszczony() const { return czyJestZniszczony; }
+    int getPunktyZycia() const { return punktyZycia; }
+    sf::Vector2f getPozycja() const { return getPosition(); }
 };
 
-// DEFINICJA TABLICY 
 const std::array<sf::Color, 4> Cegla::colorLUT = {
     sf::Color::Transparent,
     sf::Color(255, 228, 225),

@@ -3,21 +3,19 @@
 #include "menu.h"
 #include "game.h"
 
-// wymiary okna
 const unsigned int width = 640;
 const unsigned int height = 480;
 
-enum class GameState { Menu, Playing, Exiting };
+enum class GameMode { Menu, Playing, Exiting };
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(width, height), "Arkanoid");
-
     window.setFramerateLimit(60);
 
     Menu menu(width, height);
     Game game;
 
-    GameState currentState = GameState::Menu;
+    GameMode currentState = GameMode::Menu;
     sf::Clock clock;
 
     while (window.isOpen()) {
@@ -27,14 +25,34 @@ int main() {
                 window.close();
 
             if (event.type == sf::Event::KeyPressed) {
-                if (currentState == GameState::Menu) {
+                if (currentState == GameMode::Menu) {
                     if (event.key.code == sf::Keyboard::Up) menu.przesunG();
                     if (event.key.code == sf::Keyboard::Down) menu.przesunD();
                     if (event.key.code == sf::Keyboard::Enter) {
                         int sel = menu.getSelectedItem();
-                        if (sel == 0) currentState = GameState::Playing; // Nowa gra
-                        else if (sel == 1) std::cout << "Ostatnie wyniki" << std::endl;
-                        else if (sel == 2) window.close(); // Wyjœcie
+                        if (sel == 0) {
+                            game.reset();
+                            currentState = GameMode::Playing;
+                            std::cout << "Nowa gra" << std::endl;
+                        }
+                        else if (sel == 1) {
+                            currentState = GameMode::Playing;
+                            std::cout << "Wczytano poprzednia gre" << std::endl;
+                        }
+                        else if (sel == 2) {
+                            std::cout << "Ostatnie wyniki" << std::endl;
+                        }
+                        else if (sel == 3) {
+							std::cout << "Menu graficzne zamkniete" << std::endl;
+                            window.close();
+                        }
+                    }
+                }
+                else if (currentState == GameMode::Playing) {
+                    if (event.key.code == sf::Keyboard::Escape) {
+                        game.zapiszAktualnyStan();  // zapis stanu gry
+                        currentState = GameMode::Menu;  // powrot do menu
+                        std::cout << "Powrot do menu (ESC)" << std::endl;
                     }
                 }
             }
@@ -42,14 +60,14 @@ int main() {
 
         sf::Time dt = clock.restart();
 
-        if (currentState == GameState::Playing)
+        if (currentState == GameMode::Playing)
             game.update(dt, window);
 
         window.clear(sf::Color(20, 20, 30));
 
-        if (currentState == GameState::Menu)
+        if (currentState == GameMode::Menu)
             menu.draw(window);
-        else if (currentState == GameState::Playing)
+        else if (currentState == GameMode::Playing)
             game.render(window);
 
         window.display();
