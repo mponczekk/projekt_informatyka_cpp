@@ -1,4 +1,3 @@
-#pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <algorithm>
@@ -54,11 +53,9 @@ public:
             }
         }
 
-        m_bloki.erase(
-            std::remove_if(m_bloki.begin(), m_bloki.end(),
+        m_bloki.erase(std::remove_if(m_bloki.begin(), m_bloki.end(),
                 [](const Cegla& cegla) { return cegla.czyZniszczony(); }),
-            m_bloki.end()
-        );
+            m_bloki.end());
 
         sf::Vector2f ballPos = m_pilka.getPosition();
         sf::Vector2f paddlePos = m_paletka.getPosition();
@@ -87,22 +84,26 @@ public:
     void reset() {
         m_pilka.setPosition({ 200.f, 200.f });
         m_pilka.setVelocity({ 3.f, 3.f });
-
         m_paletka.setPosition({ 640.f / 2.f, 480.f - 30.f });
-
         m_bloki.clear();
         generateBricks();
     }
 
-    void zapiszAktualnyStan() {
+    bool zapiszStan(const std::string& nazwaPliku = "zapis.txt") {
         m_gameState.capture(m_paletka, m_pilka, m_bloki);
-        std::cout << "[ZAPIS] Stan gry:" << std::endl;
-        std::cout << "  - Pozostale cegly: " << m_gameState.getBlocks().size() << std::endl;
-        std::cout << "  - Pozycja paletki: " << m_gameState.getPaddlePosition().x
-            << ", " << m_gameState.getPaddlePosition().y << std::endl;
-		std::cout << "  - Pozycja pilki: " << m_gameState.getBallPosition().x
-			<< ", " << m_gameState.getBallPosition().y << std::endl;
-        std::cout << "  - Predkosc pilki: " << m_gameState.getBallVelocity().x
-			<< ", " << m_gameState.getBallVelocity().y << std::endl;
+
+        bool sukces = m_gameState.saveToFile(nazwaPliku);
+        if (sukces) {
+            std::cout << "Gra zapisana do pliku: " << nazwaPliku << "\n";
+        }
+        else {
+            std::cout << "B³¹d zapisu do pliku!\n";
+        }
+
+        return sukces;
     }
+
+    Paletka& getPaletkaRef() { return m_paletka; }
+    Pilka& getPilkaRef() { return m_pilka; }
+    std::vector<Cegla>& getCeglyRef() { return m_bloki; }
 };

@@ -15,6 +15,19 @@ int main() {
     Menu menu(width, height);
     Game game;
 
+    GameState autoState;
+    if (autoState.loadFromFile("zapis.txt")) {
+        autoState.apply(
+            game.getPaletkaRef(),
+            game.getPilkaRef(),
+            game.getCeglyRef()
+        );
+        std::cout << "Wczytano zapisana gre przy starcie programu\n";
+    }
+    else {
+        std::cout << "Brak zapisanej gry. Mozesz zaczac nowa.\n";
+    }
+
     GameMode currentState = GameMode::Menu;
     sf::Clock clock;
 
@@ -50,7 +63,7 @@ int main() {
                 }
                 else if (currentState == GameMode::Playing) {
                     if (event.key.code == sf::Keyboard::Escape) {
-                        game.zapiszAktualnyStan();  // zapis stanu gry
+						game.zapiszStan("zapis.txt");  // zapis do pliku
                         currentState = GameMode::Menu;  // powrot do menu
                         std::cout << "Powrot do menu (ESC)" << std::endl;
                     }

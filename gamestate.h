@@ -3,6 +3,9 @@
 #include "paletka.h"
 #include "pilka.h"
 #include "cegla.h"
+#include <fstream>
+#include <string>
+#include <iostream>
 
 struct BlockData {
     float x, y;
@@ -34,6 +37,97 @@ public:
                 bd.hp = brick.getPunktyZycia();
                 blocks.push_back(bd);
             }
+        }
+    }
+
+    bool saveToFile(const std::string& filename) {
+        std::ofstream file(filename);
+
+        if (!file.is_open()) {
+            std::cerr << "B³¹d: Nie mo¿na otworzyæ pliku " << filename << " do zapisu!\n";
+            return false;
+        }
+
+        file << "PADDLE" << " " << paddlePosition.x << " " << paddlePosition.y << "\n";
+        file << "BALL" << " " << ballPosition.x << " " << ballPosition.y << " "<< ballVelocity.x << " " << ballVelocity.y << "\n";
+        file << "BLOCKS_COUNT" << " " << blocks.size() << "\n";
+
+        for (const auto& block : blocks) {
+            file << block.x << " " << block.y << " " << block.hp << "\n";
+        }
+
+        file.close();
+        return true;
+    }
+
+    bool loadFromFile(const std::string& filename) {
+        std::ifstream file(filename);
+
+        if (!file.is_open()) {
+            std::cerr << "Blad: Nie mozna otworzyc pliku " << filename << " do odczytu!\n";
+            return false;
+        }
+
+        std::string label;
+
+        // 1. Wczytaj Paletke
+        file >> label;
+        if (label != "PADDLE") {
+            std::cerr << "Blad formatu: oczekiwano PADDLE, otrzymano " << label << "\n";
+            return false;
+        }
+        file >> paddlePosition.x >> paddlePosition.y;
+
+        // 2. Wczytaj Pilke
+        file >> label;
+        if (label != "BALL") {
+            std::cerr << "Blad formatu: oczekiwano BALL, otrzymano " << label << "\n";
+            return false;
+        }
+        file >> ballPosition.x >> ballPosition.y >> ballVelocity.x >> ballVelocity.y;
+
+        // 3. Wczytaj liczbe blokow
+        file >> label;
+        if (label != "BLOCKS_COUNT") {
+            std::cerr << "Blad formatu: oczekiwano BLOCKS_COUNT, otrzymano " << label << "\n";
+            return false;
+        }
+
+        int blocksCount;
+        file >> blocksCount;
+
+        // 4. Wczytaj bloki
+        blocks.clear();
+        for (int i = 0; i < blocksCount; ++i) {
+            BlockData bd;
+            if (!(file >> bd.x >> bd.y >> bd.hp)) {
+                std::cerr << "Blad wczytywania bloku " << i << "\n";
+                return false;
+            }
+            blocks.push_back(bd);
+        }
+
+        file.close();
+        std::cout << "Wczytano stan z pliku " << filename
+            << " (blokow: " << blocks.size() << ")\n";
+        return true;
+    }
+
+    void apply(Paletka& p, Pilka& b, std::vector<Cegla>& cegly) {
+        p.setPosition(paddlePosition);
+        b.setPosition(ballPosition);
+        b.setVelocity(ballVelocity);
+        cegly.clear();
+
+        const float brickWidth = (640.f - (12 - 1) * 2.f) / 12;
+        const float brickHeight = 20.f;
+
+        for (const auto& block : blocks) {
+            cegly.emplace_back(
+                sf::Vector2f(block.x, block.y),
+                sf::Vector2f(brickWidth, brickHeight),
+                block.hp
+            );
         }
     }
 
