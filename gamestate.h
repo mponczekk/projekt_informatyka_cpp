@@ -18,14 +18,17 @@ private:
     sf::Vector2f ballPosition;
     sf::Vector2f ballVelocity;
     std::vector<BlockData> blocks;
+    int punkty;
 
 public:
     inline void capture(const Paletka& paddle,
         const Pilka& ball,
-        const std::vector<Cegla>& bricks) {
+        const std::vector<Cegla>& bricks, 
+        int sumaPunktow = 0) {
         paddlePosition = paddle.getPosition();
         ballPosition = ball.getPosition();
         ballVelocity = ball.getVelocity();
+		punkty = sumaPunktow;
 
         blocks.clear();
         for (const auto& brick : bricks) {
@@ -44,12 +47,13 @@ public:
         std::ofstream file(filename);
 
         if (!file.is_open()) {
-            std::cerr << "B³¹d: Nie mo¿na otworzyæ pliku " << filename << " do zapisu!\n";
+            std::cerr << "B??d: Nie mo?na otworzy? pliku " << filename << " do zapisu!\n";
             return false;
         }
 
         file << "PADDLE" << " " << paddlePosition.x << " " << paddlePosition.y << "\n";
-        file << "BALL" << " " << ballPosition.x << " " << ballPosition.y << " "<< ballVelocity.x << " " << ballVelocity.y << "\n";
+        file << "BALL" << " " << ballPosition.x << " " << ballPosition.y << " " << ballVelocity.x << " " << ballVelocity.y << "\n";
+		file << "POINTS" << " " << punkty << "\n";
         file << "BLOCKS_COUNT" << " " << blocks.size() << "\n";
 
         for (const auto& block : blocks) {
@@ -62,6 +66,8 @@ public:
 
     bool loadFromFile(const std::string& filename) {
         std::ifstream file(filename);
+
+        punkty = 0;
 
         if (!file.is_open()) {
             std::cerr << "Blad: Nie mozna otworzyc pliku " << filename << " do odczytu!\n";
@@ -86,7 +92,16 @@ public:
         }
         file >> ballPosition.x >> ballPosition.y >> ballVelocity.x >> ballVelocity.y;
 
-        // 3. Wczytaj liczbe blokow
+        // 3. Wczytaj liczbe punktow
+		file >> label;
+        if (label != "POINTS") {
+            std::cerr << "Blad formatu: oczekiwano POINTS, otrzymano " << label << "\n";
+            return false;
+		}
+		file >> punkty;
+
+
+        // 4. Wczytaj liczbe blokow
         file >> label;
         if (label != "BLOCKS_COUNT") {
             std::cerr << "Blad formatu: oczekiwano BLOCKS_COUNT, otrzymano " << label << "\n";
@@ -96,7 +111,7 @@ public:
         int blocksCount;
         file >> blocksCount;
 
-        // 4. Wczytaj bloki
+        // 5. Wczytaj bloki
         blocks.clear();
         for (int i = 0; i < blocksCount; ++i) {
             BlockData bd;
@@ -108,15 +123,15 @@ public:
         }
 
         file.close();
-        std::cout << "Wczytano stan z pliku " << filename
-            << " (blokow: " << blocks.size() << ")\n";
+        std::cout << "Wczytano stan z pliku " << filename << " (blokow: " << blocks.size() << ", punkty: " << punkty << ")\n";
         return true;
     }
 
-    void apply(Paletka& p, Pilka& b, std::vector<Cegla>& cegly) {
+    void apply(Paletka& p, Pilka& b, std::vector<Cegla>& cegly, int& sumaPunktow) {
         p.setPosition(paddlePosition);
         b.setPosition(ballPosition);
         b.setVelocity(ballVelocity);
+		sumaPunktow = punkty;
         cegly.clear();
 
         const float brickWidth = (640.f - (12 - 1) * 2.f) / 12;
@@ -131,7 +146,7 @@ public:
         }
     }
 
- 
+
     sf::Vector2f getPaddlePosition() const { return paddlePosition; }
     sf::Vector2f getBallPosition() const { return ballPosition; }
     sf::Vector2f getBallVelocity() const { return ballVelocity; }

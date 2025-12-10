@@ -1,4 +1,4 @@
-#include <SFML/Graphics.hpp>
+ï»¿#include <SFML/Graphics.hpp>
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -12,23 +12,50 @@ private:
     std::vector<Cegla> m_bloki;
     GameState m_gameState;
 
+    int m_punkty;
+    sf::Font punkty_font;
+    sf::Text punkty_text;
+
     const int ILOSC_KOLUMN = 12;
-    const int ILOSC_WIERSZY = 4;
+    const int ILOSC_WIERSZY = 3;
     float m_blockWidth;
     float m_blockHeight;
 
     void generateBricks() {
-        for (int y = 0; y < ILOSC_WIERSZY; y++)
+        for (int y = 0; y < ILOSC_WIERSZY; y++) {
+
+            int punktyZycia;
+
+            if (y == 0)
+                punktyZycia = 3;
+            else if (y == 1)
+                punktyZycia = 2;
+            else
+                punktyZycia = 1;
+
             for (int x = 0; x < ILOSC_KOLUMN; x++)
                 m_bloki.emplace_back(
                     sf::Vector2f(x * (m_blockWidth + 2.f), 30.f + y * (m_blockHeight + 2.f)),
-                    sf::Vector2f(m_blockWidth, m_blockHeight), 3);
+                    sf::Vector2f(m_blockWidth, m_blockHeight), punktyZycia);
+        }
     }
+
+    void aktualizujTekstPunktow() {
+        punkty_text.setString("Punkty: " + std::to_string(m_punkty));
+	}
 
 public:
     Game()
         : m_pilka({ 200.f, 200.f }, { 3.f, 3.f }, 10.f),
-        m_paletka({ 640.f / 2.f, 480.f - 30.f }) {
+        m_paletka({ 640.f / 2.f, 480.f - 30.f }), m_punkty(0) {
+
+        punkty_font.loadFromFile("Chunkfive Ex.ttf");
+        punkty_text.setFont(punkty_font);
+        punkty_text.setCharacterSize(20);
+        punkty_text.setFillColor(sf::Color(192, 192, 192));
+        punkty_text.setPosition(10.f, 2.f);
+        aktualizujTekstPunktow();
+
         m_blockWidth = (640.f - (ILOSC_KOLUMN - 1) * 2.f) / ILOSC_KOLUMN;
         m_blockHeight = 20.f;
         generateBricks();
@@ -48,13 +75,15 @@ public:
             if (cegla.czyZniszczony()) continue;
             if (cegla.getGlobalBounds().intersects(m_pilka.getGlobalBounds())) {
                 m_pilka.odbijY();
+				m_punkty += 10;
+				aktualizujTekstPunktow();
                 cegla.trafienie();
                 break;
             }
         }
 
         m_bloki.erase(std::remove_if(m_bloki.begin(), m_bloki.end(),
-                [](const Cegla& cegla) { return cegla.czyZniszczony(); }),
+            [](const Cegla& cegla) { return cegla.czyZniszczony(); }),
             m_bloki.end());
 
         sf::Vector2f ballPos = m_pilka.getPosition();
@@ -79,6 +108,7 @@ public:
         m_pilka.rysuj(target);
         for (auto& cegla : m_bloki)
             if (!cegla.czyZniszczony()) target.draw(cegla);
+		target.draw(punkty_text);
     }
 
     void reset() {
@@ -86,21 +116,28 @@ public:
         m_pilka.setVelocity({ 3.f, 3.f });
         m_paletka.setPosition({ 640.f / 2.f, 480.f - 30.f });
         m_bloki.clear();
+		m_punkty = 0;
+        aktualizujTekstPunktow();
         generateBricks();
     }
 
     bool zapiszStan(const std::string& nazwaPliku = "zapis.txt") {
-        m_gameState.capture(m_paletka, m_pilka, m_bloki);
+        m_gameState.capture(m_paletka, m_pilka, m_bloki, m_punkty);
 
         bool sukces = m_gameState.saveToFile(nazwaPliku);
         if (sukces) {
             std::cout << "Gra zapisana do pliku: " << nazwaPliku << "\n";
         }
         else {
-            std::cout << "B³¹d zapisu do pliku!\n";
+            std::cout << "Blad zapisu do pliku!\n";
         }
 
         return sukces;
+    }
+
+    void ustawPunktyZPliku(int punkty) {
+        m_punkty = punkty;
+        aktualizujTekstPunktow();
     }
 
     Paletka& getPaletkaRef() { return m_paletka; }

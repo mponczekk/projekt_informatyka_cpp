@@ -16,11 +16,13 @@ int main() {
     Game game;
 
     GameState autoState;
+	int wczytanePunkty = 0;
     if (autoState.loadFromFile("zapis.txt")) {
         autoState.apply(
             game.getPaletkaRef(),
             game.getPilkaRef(),
-            game.getCeglyRef()
+            game.getCeglyRef(),
+            wczytanePunkty
         );
         std::cout << "Wczytano zapisana gre przy starcie programu\n";
     }
@@ -51,19 +53,20 @@ int main() {
                         else if (sel == 1) {
                             currentState = GameMode::Playing;
                             std::cout << "Wczytano poprzednia gre" << std::endl;
+							game.ustawPunktyZPliku(wczytanePunkty);
                         }
                         else if (sel == 2) {
                             std::cout << "Ostatnie wyniki" << std::endl;
                         }
                         else if (sel == 3) {
-							std::cout << "Menu graficzne zamkniete" << std::endl;
+                            std::cout << "Menu graficzne zamkniete" << std::endl;
                             window.close();
                         }
                     }
                 }
                 else if (currentState == GameMode::Playing) {
                     if (event.key.code == sf::Keyboard::Escape) {
-						game.zapiszStan("zapis.txt");  // zapis do pliku
+                        game.zapiszStan("zapis.txt");  // zapis do pliku
                         currentState = GameMode::Menu;  // powrot do menu
                         std::cout << "Powrot do menu (ESC)" << std::endl;
                     }
