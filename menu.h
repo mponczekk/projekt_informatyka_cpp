@@ -2,7 +2,7 @@
 #include <array>
 #include <iostream>
 
-#define MAX_LICZBA_POZIOMOW 4
+#define MAX_LICZBA_POZIOMOW 3
 
 class Menu {
 private:
@@ -19,8 +19,7 @@ public:
 
         menu[0].setFont(font); menu[0].setFillColor(sf::Color(255, 165, 0)); menu[0].setString("Nowa gra");
         menu[1].setFont(font); menu[1].setFillColor(sf::Color::White); menu[1].setString("Wczytaj gre");
-        menu[2].setFont(font); menu[2].setFillColor(sf::Color::White); menu[2].setString("Ostatnie wyniki");
-        menu[3].setFont(font); menu[3].setFillColor(sf::Color::White); menu[3].setString("Wyjscie");
+        menu[2].setFont(font); menu[2].setFillColor(sf::Color::White); menu[2].setString("Wyjscie");
 
         for (int i = 0; i < MAX_LICZBA_POZIOMOW; i++) {
             menu[i].setOrigin(

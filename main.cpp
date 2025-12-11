@@ -24,6 +24,7 @@ int main() {
             game.getCeglyRef(),
             wczytanePunkty
         );
+        game.ustawPunktyZPliku(wczytanePunkty);
         std::cout << "Wczytano zapisana gre przy starcie programu\n";
     }
     else {
@@ -51,14 +52,26 @@ int main() {
                             std::cout << "Nowa gra" << std::endl;
                         }
                         else if (sel == 1) {
-                            currentState = GameMode::Playing;
-                            std::cout << "Wczytano poprzednia gre" << std::endl;
-							game.ustawPunktyZPliku(wczytanePunkty);
+                            GameState tempState;
+                            int wczytanePunkty = 0;
+
+                            if (tempState.loadFromFile("zapis.txt")) {
+                                tempState.apply(
+                                    game.getPaletkaRef(),
+                                    game.getPilkaRef(),
+                                    game.getCeglyRef(),
+                                    wczytanePunkty
+                                );
+                                game.ustawPunktyZPliku(wczytanePunkty);
+
+                                currentState = GameMode::Playing;
+                                std::cout << "Wczytano poprzednia gre (punkty: " << wczytanePunkty << ")" << std::endl;
+                            }
+                            else {
+                                std::cout << "Nie mozna wczytac zapisanej gry!" << std::endl;
+                            }
                         }
                         else if (sel == 2) {
-                            std::cout << "Ostatnie wyniki" << std::endl;
-                        }
-                        else if (sel == 3) {
                             std::cout << "Menu graficzne zamkniete" << std::endl;
                             window.close();
                         }
